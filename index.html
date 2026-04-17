@@ -96,30 +96,7 @@ function addArt(id){var t=prompt("Title:");if(!t)return;gm(id).ar.push(t);save()
 function sTp(i){D.topics[i].p=document.getElementById("tp"+i).value;D.topics[i].t=document.getElementById("tt"+i).value;D.topics[i].d=document.getElementById("td"+i).value;save();alert("Saved!")}
 function dTp(i){if(!confirm("Delete?"))return;D.topics.splice(i,1);save();openOv("topics")}
 function addTp(){D.topics.push({p:"New",t:"Topic",d:"Desc."});save();openOv("topics")}
-async function sP(k){
-  const post = {
-    date: k,
-    mod: document.getElementById("p1").value,
-    color: document.getElementById("p2").value,
-    full: document.getElementById("p3").value,
-    prefix: document.getElementById("p4").value,
-    title: document.getElementById("p5").value,
-    desc: document.getElementById("p6").value
-  };
-
-  const { error } = await supabaseClient
-    .from("posts")
-    .insert([post]);
-
-  if (error) {
-    alert("Error: " + error.message);
-    return;
-  }
-
-  alert("Saved globally!");
-  closeOv();
-  goDaily();
-}
+function sP(k){D.customPosts[k]={mod:document.getElementById("p1").value,color:document.getElementById("p2").value,full:document.getElementById("p3").value,prefix:document.getElementById("p4").value,title:document.getElementById("p5").value,desc:document.getElementById("p6").value};save();alert("Saved!");closeOv();goDaily()}
 function rP(k){if(!confirm("Reset?"))return;delete D.customPosts[k];save();closeOv();goDaily()}
 function createNew(){var mid=document.getElementById("na_mod").value;var title=document.getElementById("na_title").value.trim();if(!title){alert("Enter title!");return;}gm(mid).ar.push(title);save();var idx=gm(mid).ar.length;localStorage.setItem("art_"+mid+"_"+(idx-1),'<h2>About</h2><p>Start writing. Paste from SAP Help, LinkedIn, Word etc.</p><div class="ss2"><b>Paste Screenshot Here</b><br>Ctrl+V</div>');closeOv();goArt(mid,idx)}
 function goHome(){document.getElementById("bh").className="nb on";document.getElementById("bd").className="nb";document.getElementById("ln").textContent=D.name;var nw=new Date(),post=gp(nw),tk=mkk(nw),ic=D.customPosts[tk]?true:false;var ta=0;for(var i=0;i<D.mods.length;i++)ta+=D.mods[i].ar.length;
@@ -152,41 +129,7 @@ function cSB(t,m){var b=document.getElementById("artBody");var x="Title: "+t+"\n
 function cp(t,m){if(navigator.clipboard)navigator.clipboard.writeText(t).then(function(){alert(m)});else{var a=document.createElement("textarea");a.value=t;document.body.appendChild(a);a.select();document.execCommand("copy");document.body.removeChild(a);alert(m)}}
 function goDaily(){document.getElementById("bh").className="nb";document.getElementById("bd").className="nb on";doff=0;var h='<div style="max-width:620px;margin:0 auto;padding:8px 12px"><h1 style="text-align:center;font-size:1.1rem;margin-bottom:2px">Daily <span style="color:#06f">SAP</span> Feed</h1>';if(isAdmin)h+='<p style="text-align:center;margin-bottom:5px"><button onclick="openOv(\'topics\')" style="padding:3px 8px;background:#ffc107;border:none;border-radius:3px;cursor:pointer;font-size:.65rem;font-weight:700">TOPICS</button></p>';h+='<div id="dlist"></div><div style="text-align:center;margin:8px 0"><button onclick="loadMore()" style="padding:6px 14px;background:#06f;color:#fff;border:none;border-radius:4px;font-weight:700;font-family:inherit;font-size:.78rem">More</button></div></div>';document.getElementById("main").innerHTML=h;loadMore();window.scrollTo(0,0);}
 function loadMore(){var l=document.getElementById("dlist");if(!l)return;var html="";for(var i=0;i<10;i++){var d=new Date();d.setDate(d.getDate()-doff-i);var k=mkk(d),post=gp(d),ic=D.customPosts[k]?true:false;var ds=DN[d.getDay()]+", "+MO[d.getMonth()]+" "+d.getDate()+", "+d.getFullYear();html+='<div class="dpc">';if(isAdmin)html+='<button onclick="openOv(\'post\',\''+k+'\')" style="position:absolute;top:4px;right:4px;padding:2px 6px;background:#ffc107;border:none;border-radius:2px;cursor:pointer;font-size:.58rem;font-weight:700;z-index:2">EDIT</button>';html+='<div style="font-size:.6rem;color:#999;margin-bottom:1px">'+ds+(ic?' <span style="background:#e6f0ff;color:#06f;padding:0 3px;border-radius:2px;font-size:.48rem;font-weight:700">CUSTOM</span>':'')+'</div><div style="display:inline-block;padding:1px 4px;border-radius:2px;font-size:.6rem;font-weight:700;background:'+post.color+'20;color:'+post.color+'">'+post.mod+'</div><h3 style="font-size:.8rem;margin:1px 0">'+post.prefix+': '+post.mod+' - '+post.title+'</h3><p style="color:#666;font-size:.7rem">'+post.desc+'</p></div>';}l.innerHTML+=html;doff+=10;}
-document.onkeydown=function(e){if(e.key==="Escape")closeOv()};loadGlobalPosts().then(() => {
-  goHome();
-});
-</script>
-async function loadGlobalPosts() {
-  const { data, error } = await supabaseClient
-    .from("posts")
-    .select("*");
-
-  if (error) {
-    console.error(error);
-    return;
-  }
-
-  D.customPosts = {};
-
-  data.forEach(p => {
-    D.customPosts[p.date] = {
-      mod: p.mod,
-      color: p.color,
-      full: p.full,
-      prefix: p.prefix,
-      title: p.title,
-      desc: p.desc
-    };
-  });
-}
-</script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-
-<script>
-/*const supabaseClient = supabase.createClient(
-  "https://vgrkqitmbfazeqkrqajh.supabase.co",
-  "sb_publishable_0mIepvJesLsrol6B4LR8aw_idAGm5vN"
-);
+document.onkeydown=function(e){if(e.key==="Escape")closeOv()};goHome();
 </script>
 </body>
 </html>
