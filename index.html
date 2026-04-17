@@ -156,14 +156,6 @@ document.onkeydown=function(e){if(e.key==="Escape")closeOv()};loadGlobalPosts().
   goHome();
 });
 </script>
-<!-- THEN add Supabase -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-
-<script>
-const supabaseClient = supabase.createClient(
-  "https://vgrkqitmbfazeqkrqajh.supabase.co",
-  "sb_publishable_0mIepvJesLsrol6B4LR8aw_idAGm5vN"
-);
 async function loadGlobalPosts() {
   const { data, error } = await supabaseClient
     .from("posts")
@@ -191,7 +183,7 @@ async function loadGlobalPosts() {
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 
 <script>
-const supabaseClient = supabase.createClient(
+/*const supabaseClient = supabase.createClient(
   "https://vgrkqitmbfazeqkrqajh.supabase.co",
   "sb_publishable_0mIepvJesLsrol6B4LR8aw_idAGm5vN"
 );
