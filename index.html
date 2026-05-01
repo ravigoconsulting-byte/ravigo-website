@@ -93,7 +93,12 @@ var MO=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
 var DN=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 var isAdmin=false,rtab="sd",rpg=1,doff=0;
 async function save(){
-  await saveData(D);
+  console.log("SAVE CLICKED");
+
+  const cleanData = JSON.parse(JSON.stringify(D));
+
+  await saveData(cleanData);
+
   console.log("Saved to Firebase");
 }
 function dayN(d){return Math.floor((d-new Date(d.getFullYear(),0,0))/864e5)}
