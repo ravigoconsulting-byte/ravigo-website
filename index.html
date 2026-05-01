@@ -27,8 +27,8 @@ a[href="index.html"],.back,.back-link{display:none!important}
 <div id="main"></div>
 <div class="ov" id="ov" onclick="if(event.target===this)closeOv()"><div class="ov-box"><div class="ov-head"><b id="ovT">Editor</b><button onclick="closeOv()" style="background:none;border:none;color:#fff;font-size:1.2rem;cursor:pointer">X</button></div><div class="ov-body" id="ovB"></div></div></div>
 <script>
-var D;try{D=JSON.parse(localStorage.getItem("rav10"))}catch(e){D=null}
-if(!D){D={
+var D = null;
+var DEFAULT_DATA = {
 name:"RAVIGO",badge:"22 SAP Modules | 2200+ Articles | Updated Daily",
 desc:"Complete SAP hub: SD, MM, FICO, PP, PM, QM, HCM, EHS, GTS, SF, Ariba, BTP, Analytics, TM, EWM, BN4L, YL, GTT, EM, PS, WM, Basis.",
 footer:"RAVIGO - Complete SAP Knowledge Hub",
@@ -70,12 +70,24 @@ topics:[
 {id:"wm",nm:"SAP WM",fn:"Warehouse Management",cl:"#047857",ds:"Warehouse structure, storage types, transfer orders, strategies.",tg:["Transfer Order","Storage","Picking","Putaway"],tc:["LT01","LT10","LT21","LB01","LI01N"],tb:["LQUA","LTAP","LTAK","LAGP","LINK"],bd:["EXIT_SAPLL03A_001"],ar:["WM Architecture","Warehouse Structure","Warehouse Number","Storage Type Config","Storage Section","Storage Bin Config","Quant Management","Transfer Order LT01","TO Creation Strategies","Manual TO","Automatic TO","Transfer Requirement","Putaway Strategy","FIFO Strategy","Fixed Bin Strategy","Open Storage Strategy","Addition to Stock","Picking Strategy","Pick Point","Wave Pick Config","Two-Step Picking","Hazmat Storage","GR in WM","GR with PO","GR without PO","GI in WM","GI for Production","GI for Sales","Stock Transfer WM","Posting Change","Physical Inventory WM","WM-IM Integration","WM-PP Integration","WM-SD Integration","WM-QM Integration","Lean WM Config","Decentralized WM","WM RF Framework","RF Transaction","Barcode Config","Interim Storage","Interface Storage","Bulk Storage","Rack Storage","Block Storage","Staging Area","WM Handling Units","WM Output","WM Workflow","WM Authorization","WM Number Ranges","WM User Exits","WM Custom Reports","WM Data Migration","WM Testing","WM Performance","WM Batch Jobs","WM KPIs","WM in Manufacturing","WM in Distribution","WM in Retail","WM to EWM Migration","S/4HANA Impact WM","WM vs EWM","WM Fiori Apps","WM Analytics","WM Best Practices","Stock Overview WM","Available Stock","Capacity Check","Yard Mgmt WM","Cross-Docking WM","Returns WM","Consignment WM","WM Printing","Label Design","Cycle Count WM","Annual Inventory","WM Integration Points","WM Troubleshooting","WM Common Errors","WM Month-End","WM Year-End","WM Documentation","WM Go-Live Checklist","WM Cutover","WM Training","WM Safety","WM Regulatory","WM Cost Optimization","WM Automation","WM Roadmap","LIFO Strategy","WM New Features","WM Project Plan"]},
 {id:"basis",nm:"SAP BASIS",fn:"Basis Administration",cl:"#374151",ds:"System admin, transports, users, monitoring, performance, security.",tg:["Transport","Users","Monitor","Performance","Security"],tc:["SM37","SM50","STMS","SU01","ST22"],tb:["USR02","E070","TBTCO","SNAP"],bd:["System Admin"],ar:["BASIS Architecture","System Landscape","Three-System Landscape","Client Administration","System Profile RZ10","Instance Profile","Memory Management","Work Process Config","ICM Configuration","SAP Gateway","RFC Connection SM59","Transport System STMS","Transport Routes","Transport Requests","Import Export Process","Client Copy Refresh","System Copy","User Admin SU01","Role Authorization PFCG","Auth Objects","Profile Generator","Single Role","Composite Role","Derived Role","User Comparison","Security Audit SM19","System Log SM21","Background Jobs SM37","Job Scheduling","Job Chains","Spool Admin SP01","Print Configuration","Output Devices","System Monitor SM50","Work Process Monitor","Server Monitor SM51","Performance ST02","Buffer Analysis","SQL Trace ST05","Runtime Analysis SE30","Short Dumps ST22","Lock Management SM12","Update Processing SM13","Database Admin","DB Performance","Table Space Mgmt","DB Backup Strategy","HANA Administration","HANA Studio","HANA Cockpit","Memory Mgmt HANA","HANA Backup Recovery","Solution Manager","SOLMAN Monitoring","Fiori Launchpad Admin","Fiori Tile Config","Gateway Activation","OData Service","Web Dispatcher","SSL Certificate","Single Sign-On","SAML Configuration","SAP Router","Network Security","Kernel Upgrade","Support Packages","Enhancement Packages","S/4HANA Upgrade","License Admin","Early Watch Alert","System Landscape Dir","Basis Troubleshooting","Common Errors","Performance Optimization","Basis KPIs","Basis in Cloud BTP","Basis for S/4HANA","Basis Automation","Basis Best Practices","Disaster Recovery","High Availability","Load Balancing","Security Hardening","Data Archiving SARA","Basis New Features 2024","Basis Roadmap","Month-End Tasks","Year-End Tasks","Basis Training","Batch Input Monitor","Unicode Migration"]}
 ]}}
+async function initApp(){
+  const cloudData = await loadData();
+
+  if(cloudData){
+    D = cloudData;
+  } else {
+    D = DEFAULT_DATA;
+  }
+
+  goHome();
+}
+
 var CT=["Overview","Config","Process","Integration","Analytics","Best Practice","Technical","Industry","Development","Innovation"];
 var DF=["Beginner","Intermediate","Advanced"];var TI=["7 min","9 min","11 min","13 min","15 min"];
 var MO=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 var DN=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 var isAdmin=false,rtab="sd",rpg=1,doff=0;
-function save(){localStorage.setItem("rav10",JSON.stringify(D))}
+function save(){saveData(D);}
 function dayN(d){return Math.floor((d-new Date(d.getFullYear(),0,0))/864e5)}
 function gm(id){for(var i=0;i<D.mods.length;i++){if(D.mods[i].id===id)return D.mods[i]}return null}
 function mkk(d){var y=d.getFullYear(),m=d.getMonth()+1,dy=d.getDate();return y+"-"+(m<10?"0"+m:m)+"-"+(dy<10?"0"+dy:dy)}
@@ -131,15 +143,61 @@ function goDaily(){document.getElementById("bh").className="nb";document.getElem
 function loadMore(){var l=document.getElementById("dlist");if(!l)return;var html="";for(var i=0;i<10;i++){var d=new Date();d.setDate(d.getDate()-doff-i);var k=mkk(d),post=gp(d),ic=D.customPosts[k]?true:false;var ds=DN[d.getDay()]+", "+MO[d.getMonth()]+" "+d.getDate()+", "+d.getFullYear();html+='<div class="dpc">';if(isAdmin)html+='<button onclick="openOv(\'post\',\''+k+'\')" style="position:absolute;top:4px;right:4px;padding:2px 6px;background:#ffc107;border:none;border-radius:2px;cursor:pointer;font-size:.58rem;font-weight:700;z-index:2">EDIT</button>';html+='<div style="font-size:.6rem;color:#999;margin-bottom:1px">'+ds+(ic?' <span style="background:#e6f0ff;color:#06f;padding:0 3px;border-radius:2px;font-size:.48rem;font-weight:700">CUSTOM</span>':'')+'</div><div style="display:inline-block;padding:1px 4px;border-radius:2px;font-size:.6rem;font-weight:700;background:'+post.color+'20;color:'+post.color+'">'+post.mod+'</div><h3 style="font-size:.8rem;margin:1px 0">'+post.prefix+': '+post.mod+' - '+post.title+'</h3><p style="color:#666;font-size:.7rem">'+post.desc+'</p></div>';}l.innerHTML+=html;doff+=10;}
 document.onkeydown=function(e){if(e.key==="Escape")closeOv()};goHome();
 </script>
+<!-- your entire website code -->
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDHUhO11WEbm6I6d1-s7gmxwr_fdG5J2-A",
+  authDomain: "ravigo-site.firebaseapp.com",
+  projectId: "ravigo-site",
+  storageBucket: "ravigo-site.firebasestorage.app",
+  messagingSenderId: "1021637093467",
+  appId: "1:1021637093467:web:902c51bcd541de7073377e"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+window.loadData = async function () {
+  const ref = doc(db, "ravigo", "main");
+  const snap = await getDoc(ref);
+  return snap.exists() ? snap.data() : null;
+};
+
+window.saveData = async function (data) {
+  await setDoc(doc(db, "ravigo", "main"), data);
+};
+</script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDHUhO11WEbm6I6d1-s7gmxwr_fdG5J2-A",
+  authDomain: "ravigo-site.firebaseapp.com",
+  projectId: "ravigo-site",
+  storageBucket: "ravigo-site.firebasestorage.app",
+  messagingSenderId: "1021637093467",
+  appId: "1:1021637093467:web:902c51bcd541de7073377e"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+window.loadData = async function () {
+  const ref = doc(db, "ravigo", "main");
+  const snap = await getDoc(ref);
+  return snap.exists() ? snap.data() : null;
+};
+
+window.saveData = async function (data) {
+  await setDoc(doc(db, "ravigo", "main"), data);
+};
+initApp();
+</script>
 </body>
 </html>
 ```
-<!-- Supabase MUST be last -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-
-<script>
-window.supabaseClient = supabase.createClient(
-  "https://vgrkqitmbfazeqkrqajh.supabase.co",
-  "sb_publishable_0mIepvJesLsrol6B4LR8aw_idAGm5vN"
-);
-</script>
