@@ -95,7 +95,7 @@ var isAdmin=false,rtab="sd",rpg=1,doff=0;
 async function save(){
   console.log("SAVE CLICKED");
 
-  const cleanData = JSON.parse(JSON.stringify(D));
+  const cleanData = removeNestedArrays(D);
 
   await saveData(cleanData);
 
