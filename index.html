@@ -92,11 +92,29 @@ var DF=["Beginner","Intermediate","Advanced"];var TI=["7 min","9 min","11 min","
 var MO=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 var DN=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 var isAdmin=false,rtab="sd",rpg=1,doff=0;
-
+function removeNestedArrays(obj) {
+  if (Array.isArray(obj)) {
+    return obj.map(item => {
+      if (Array.isArray(item)) {
+        return item.join(", "); // 🔥 flatten nested array
+      }
+      return removeNestedArrays(item);
+    });
+  } else if (typeof obj === "object" && obj !== null) {
+    const newObj = {};
+    for (let key in obj) {
+      newObj[key] = removeNestedArrays(obj[key]);
+    }
+    return newObj;
+  }
+  return obj;
+}
 async function save(){
   console.log("SAVE CLICKED");
 
-  await saveData(D);
+  const cleanData = removeNestedArrays(D);
+
+  await saveData(cleanData);
 
   console.log("Saved to Firebase");
 }
@@ -122,21 +140,7 @@ function dTp(i){if(!confirm("Delete?"))return;D.topics.splice(i,1);save();openOv
 function addTp(){D.topics.push({p:"New",t:"Topic",d:"Desc."});save();openOv("topics")}
 function sP(k){D.customPosts[k]={mod:document.getElementById("p1").value,color:document.getElementById("p2").value,full:document.getElementById("p3").value,prefix:document.getElementById("p4").value,title:document.getElementById("p5").value,desc:document.getElementById("p6").value};save();alert("Saved!");closeOv();goDaily()}
 function rP(k){if(!confirm("Reset?"))return;delete D.customPosts[k];save();closeOv();goDaily()}
-function createNew(){var mid=document.getElementById("na_mod").value;var title=document.getElementById("na_title").value.trim();if(!title){alert("Enter title!");return;}gm(mid).ar.push(title);save();var idx=gm(mid).ar.length;// ✅ Initialize content in global data (Firebase-bound)
-if(!D.articleContent) D.articleContent = {};
-if(!D.articleContent[mid]) D.articleContent[mid] = {};
-
-D.articleContent[mid][idx] = `
-  <h2>About</h2>
-  <p>Start writing. Paste from SAP Help, LinkedIn, Word etc.</p>
-  <div class="ss2"><b>Paste Screenshot Here</b><br>Ctrl+V</div>
-`;
-
-save();        // ✅ save to Firebase
-closeOv();
-goArt(mid, idx);
-}
-
+function createNew(){var mid=document.getElementById("na_mod").value;var title=document.getElementById("na_title").value.trim();if(!title){alert("Enter title!");return;}gm(mid).ar.push(title);save();var idx=gm(mid).ar.length;localStorage.setItem("art_"+mid+"_"+(idx-1),'<h2>About</h2><p>Start writing. Paste from SAP Help, LinkedIn, Word etc.</p><div class="ss2"><b>Paste Screenshot Here</b><br>Ctrl+V</div>');closeOv();goArt(mid,idx)}
 function goHome(){document.getElementById("bh").className="nb on";document.getElementById("bd").className="nb";document.getElementById("ln").textContent=D.name;var nw=new Date(),post=gp(nw),tk=mkk(nw),ic=D.customPosts[tk]?true:false;var ta=0;for(var i=0;i<D.mods.length;i++)ta+=D.mods[i].ar.length;
 var h='<div style="text-align:center;padding:18px 12px"><div style="display:inline-block;background:#e6f0ff;color:#06f;padding:3px 10px;border-radius:10px;font-size:.68rem;font-weight:600;margin-bottom:6px">'+D.badge+'</div><h1 style="font-size:1.4rem;margin-bottom:4px">Complete <span style="color:#06f">SAP</span> Knowledge Hub</h1><p style="color:#666;max-width:500px;margin:0 auto 10px;font-size:.82rem">'+D.desc+'</p><div style="display:flex;justify-content:center;gap:5px;margin-bottom:10px;flex-wrap:wrap">';for(var i=0;i<D.stats.length;i++)h+='<div style="background:#fff;border:1px solid #ddd;border-radius:5px;padding:5px 10px;text-align:center"><strong style="display:block;font-size:.95rem;color:#06f">'+D.stats[i][0]+'</strong><small style="color:#999;font-size:.55rem">'+D.stats[i][1]+'</small></div>';h+='</div>';
 if(isAdmin)h+='<button onclick="openOv(\'site\')" style="padding:3px 8px;background:#ffc107;border:none;border-radius:3px;cursor:pointer;font-weight:700;font-size:.65rem;margin:1px">EDIT SITE</button> <button onclick="openOv(\'topics\')" style="padding:3px 8px;background:#ffc107;border:none;border-radius:3px;cursor:pointer;font-weight:700;font-size:.65rem;margin:1px">TOPICS</button> <button class="newbtn" onclick="openOv(\'newart\')">+NEW</button>';h+='</div>';
