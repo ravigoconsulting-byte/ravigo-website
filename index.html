@@ -73,7 +73,7 @@ topics:[
 ]};
   async function fetchLatestData() {
   try {
-    const snapshot = await db.ref("yourPath").once("value"); // change path if needed
+    const snapshot = await db.ref("ravigoData").once("value"); // change path if needed
     const data = snapshot.val();
 
     console.log("🔥 Firebase data:", data);
