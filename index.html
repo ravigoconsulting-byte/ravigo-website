@@ -26,7 +26,6 @@ a[href="index.html"],.back,.back-link{display:none!important}
 <div class="nav"><div class="logo" onclick="goHome()"><b>R</b><span id="ln">RAVIGO</span></div><button class="nb on" id="bh" onclick="goHome()">Home</button><button class="nb" id="bd" onclick="goDaily()">Daily</button><div class="nr"><button class="ib abtn" onclick="toggleAdmin()" id="ab">Admin</button></div></div>
 <div id="main"></div>
 <div class="ov" id="ov" onclick="if(event.target===this)closeOv()"><div class="ov-box"><div class="ov-head"><b id="ovT">Editor</b><button onclick="closeOv()" style="background:none;border:none;color:#fff;font-size:1.2rem;cursor:pointer">X</button></div><div class="ov-body" id="ovB"></div></div></div>
-localStorage.removeItem("appData");
   <script>
 var D = null;
 var DEFAULT_DATA = {
