@@ -26,7 +26,8 @@ a[href="index.html"],.back,.back-link{display:none!important}
 <div class="nav"><div class="logo" onclick="goHome()"><b>R</b><span id="ln">RAVIGO</span></div><button class="nb on" id="bh" onclick="goHome()">Home</button><button class="nb" id="bd" onclick="goDaily()">Daily</button><div class="nr"><button class="ib abtn" onclick="toggleAdmin()" id="ab">Admin</button></div></div>
 <div id="main"></div>
 <div class="ov" id="ov" onclick="if(event.target===this)closeOv()"><div class="ov-box"><div class="ov-head"><b id="ovT">Editor</b><button onclick="closeOv()" style="background:none;border:none;color:#fff;font-size:1.2rem;cursor:pointer">X</button></div><div class="ov-body" id="ovB"></div></div></div>
-<script>
+localStorage.removeItem("appData");
+  <script>
 var D = null;
 var DEFAULT_DATA = {
 name:"RAVIGO",badge:"22 SAP Modules | 2200+ Articles | Updated Daily",
@@ -70,23 +71,40 @@ topics:[
 {id:"wm",nm:"SAP WM",fn:"Warehouse Management",cl:"#047857",ds:"Warehouse structure, storage types, transfer orders, strategies.",tg:["Transfer Order","Storage","Picking","Putaway"],tc:["LT01","LT10","LT21","LB01","LI01N"],tb:["LQUA","LTAP","LTAK","LAGP","LINK"],bd:["EXIT_SAPLL03A_001"],ar:["WM Architecture","Warehouse Structure","Warehouse Number","Storage Type Config","Storage Section","Storage Bin Config","Quant Management","Transfer Order LT01","TO Creation Strategies","Manual TO","Automatic TO","Transfer Requirement","Putaway Strategy","FIFO Strategy","Fixed Bin Strategy","Open Storage Strategy","Addition to Stock","Picking Strategy","Pick Point","Wave Pick Config","Two-Step Picking","Hazmat Storage","GR in WM","GR with PO","GR without PO","GI in WM","GI for Production","GI for Sales","Stock Transfer WM","Posting Change","Physical Inventory WM","WM-IM Integration","WM-PP Integration","WM-SD Integration","WM-QM Integration","Lean WM Config","Decentralized WM","WM RF Framework","RF Transaction","Barcode Config","Interim Storage","Interface Storage","Bulk Storage","Rack Storage","Block Storage","Staging Area","WM Handling Units","WM Output","WM Workflow","WM Authorization","WM Number Ranges","WM User Exits","WM Custom Reports","WM Data Migration","WM Testing","WM Performance","WM Batch Jobs","WM KPIs","WM in Manufacturing","WM in Distribution","WM in Retail","WM to EWM Migration","S/4HANA Impact WM","WM vs EWM","WM Fiori Apps","WM Analytics","WM Best Practices","Stock Overview WM","Available Stock","Capacity Check","Yard Mgmt WM","Cross-Docking WM","Returns WM","Consignment WM","WM Printing","Label Design","Cycle Count WM","Annual Inventory","WM Integration Points","WM Troubleshooting","WM Common Errors","WM Month-End","WM Year-End","WM Documentation","WM Go-Live Checklist","WM Cutover","WM Training","WM Safety","WM Regulatory","WM Cost Optimization","WM Automation","WM Roadmap","LIFO Strategy","WM New Features","WM Project Plan"]},
 {id:"basis",nm:"SAP BASIS",fn:"Basis Administration",cl:"#374151",ds:"System admin, transports, users, monitoring, performance, security.",tg:["Transport","Users","Monitor","Performance","Security"],tc:["SM37","SM50","STMS","SU01","ST22"],tb:["USR02","E070","TBTCO","SNAP"],bd:["System Admin"],ar:["BASIS Architecture","System Landscape","Three-System Landscape","Client Administration","System Profile RZ10","Instance Profile","Memory Management","Work Process Config","ICM Configuration","SAP Gateway","RFC Connection SM59","Transport System STMS","Transport Routes","Transport Requests","Import Export Process","Client Copy Refresh","System Copy","User Admin SU01","Role Authorization PFCG","Auth Objects","Profile Generator","Single Role","Composite Role","Derived Role","User Comparison","Security Audit SM19","System Log SM21","Background Jobs SM37","Job Scheduling","Job Chains","Spool Admin SP01","Print Configuration","Output Devices","System Monitor SM50","Work Process Monitor","Server Monitor SM51","Performance ST02","Buffer Analysis","SQL Trace ST05","Runtime Analysis SE30","Short Dumps ST22","Lock Management SM12","Update Processing SM13","Database Admin","DB Performance","Table Space Mgmt","DB Backup Strategy","HANA Administration","HANA Studio","HANA Cockpit","Memory Mgmt HANA","HANA Backup Recovery","Solution Manager","SOLMAN Monitoring","Fiori Launchpad Admin","Fiori Tile Config","Gateway Activation","OData Service","Web Dispatcher","SSL Certificate","Single Sign-On","SAML Configuration","SAP Router","Network Security","Kernel Upgrade","Support Packages","Enhancement Packages","S/4HANA Upgrade","License Admin","Early Watch Alert","System Landscape Dir","Basis Troubleshooting","Common Errors","Performance Optimization","Basis KPIs","Basis in Cloud BTP","Basis for S/4HANA","Basis Automation","Basis Best Practices","Disaster Recovery","High Availability","Load Balancing","Security Hardening","Data Archiving SARA","Basis New Features 2024","Basis Roadmap","Month-End Tasks","Year-End Tasks","Basis Training","Batch Input Monitor","Unicode Migration"]}
 ]};
+  async function fetchLatestData() {
+  try {
+    const snapshot = await db.ref("yourPath").once("value"); // change path if needed
+    const data = snapshot.val();
+
+    console.log("🔥 Firebase data:", data);
+
+    // save latest to local
+    localStorage.setItem("appData", JSON.stringify(data));
+
+    return data;
+  } catch (e) {
+    console.log("Firebase error", e);
+    return null;
+  }
+} 
   async function initApp(){
   try {
-    const cloudData = await loadData();
+    // 🔥 get fresh data always
+    const fresh = await fetchLatestData();
 
-    if (cloudData) {
-      D = cloudData;
+    if (fresh) {
+      D = fresh;
     } else {
-      D = DEFAULT_DATA;
+      let local = localStorage.getItem("appData");
+      D = local ? JSON.parse(local) : DEFAULT_DATA;
     }
+
   } catch (e) {
-    console.log("Firebase error → using default data");
     D = DEFAULT_DATA;
   }
 
   goHome();
 }
-
 var CT=["Overview","Config","Process","Integration","Analytics","Best Practice","Technical","Industry","Development","Innovation"];
 var DF=["Beginner","Intermediate","Advanced"];var TI=["7 min","9 min","11 min","13 min","15 min"];
 var MO=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
